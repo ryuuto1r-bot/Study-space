@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySpace - みんなで頑張るバーチャル勉強部屋</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .study-room {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .room-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .active-users {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+        }
+
+        .user-avatars {
+            display: flex;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            padding: 15px;
+            min-width: 150px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .user-card.me {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-status {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .timer-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .timer-display {
+            font-size: 72px;
+            font-weight: bold;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #f5576c;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-widget {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .widget-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-rank {
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .leaderboard-name {
+            flex: 1;
+        }
+
+        .leaderboard-time {
+            font-weight: 600;
+            color: #764ba2;
+        }
+
+        .ai-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+
+        .achievement-popup {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .achievement-popup.show {
+            display: block;
+        }
+
+        .study-input {
+            background: #f5f7fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .study-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .timer-display {
+                font-size: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">📚 StudySpace</div>
+            <div class="user-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="todayTime">0h 0m</div>
+                    <div class="stat-label">今日の学習</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streak">0</div>
+                    <div class="stat-label">連続日数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalPoints">0</div>
+                    <div class="stat-label">ポイント</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="study-room">
+                <div class="room-header">
+                    <h2 class="room-title">📖 集中ルーム #1</h2>
+                    <div class="active-users">
+                        <span>👥</span>
+                        <span id="activeCount">12人がオンライン</span>
+                    </div>
+                </div>
+
+                <div class="user-avatars" id="userAvatars">
+                    <div class="user-card me">
+                        <div class="user-avatar">👨‍🎓</div>
+                        <div class="user-name">あなた</div>
+                        <div class="user-status">集中モード</div>
+                    </div>
+                </div>
+
+                <div class="timer-section">
+                    <h3 style="margin-bottom: 10px;">ポモドーロタイマー</h3>
+                    <div class="timer-display" id="timer">25:00</div>
+                    <div class="timer-controls">
+                        <button class="btn btn-primary" id="startBtn">スタート</button>
+                        <button class="btn btn-secondary" id="resetBtn">リセット</button>
+                    </div>
+                </div>
+
+                <div>
+                    <input type="text" class="study-input" placeholder="今日の目標を入力..." id="goalInput">
+                    <select class="study-input" id="subjectSelect">
+                        <option>科目を選択</option>
+                        <option>数学</option>
+                        <option>英語</option>
+                        <option>物理</option>
+                        <option>プログラミング</option>
+                        <option>その他</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">🏆 今日のランキング</h3>
+                    <div id="leaderboard">
+                        <div class="leaderboard-item">
+                            <span class="leaderboard-rank">1</span>
+                            <span class="leaderboard-name">田中さん</span>
+                            <span class="leaderboard-time">6h 30m</span>
+                        </div>
+                        <div class="leaderboard-item">
+                            <span class="leaderboard-rank">2</span>
+                            <span class="leaderboard-name">佐藤さん</span>
+                            <span class="leaderboard-time">5h 45m</span>
+                        </div>
+                        <div class="leaderboard-item">
+                            <span class="leaderboard-rank">3</span>
+                            <span class="leaderboard-name">山田さん</span>
+                            <span class="leaderboard-time">4h 20m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">🎯 今週の目標</h3>
+                    <div style="background: #f0f0f0; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
+                        <div style="font-weight: 600;">合計: 15時間 / 30時間</div>
+                        <div style="background: white; border-radius: 5px; height: 10px; margin-top: 5px;">
+                            <div style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: 50%; border-radius: 5px;"></div>
+                        </div>
+                    </div>
+                    <div style="font-size: 14px; color: #666;">
+                        あと15時間で目標達成！<br>
+                        1日あたり3時間のペース
+                    </div>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">🔥 獲得バッジ</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <span style="font-size: 32px;" title="初心者">🌱</span>
+                        <span style="font-size: 32px;" title="3日連続">🔥</span>
+                        <span style="font-size: 32px;" title="早起き">🌅</span>
+                        <span style="font-size: 32px; opacity: 0.3;" title="未獲得">🏆</span>
+                        <span style="font-size: 32px; opacity: 0.3;" title="未獲得">💎</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ai-assistant" id="aiAssistant" title="AI学習アシスタント">
+        🤖
+    </div>
+
+    <div class="achievement-popup" id="achievementPopup">
+        <div style="font-size: 48px; text-align: center; margin-bottom: 10px;">🎉</div>
+        <div style="font-weight: bold; text-align: center;">新しいバッジを獲得！</div>
+        <div style="text-align: center; color: #666; margin-top: 5px;">「集中マスター」</div>
+    </div>
+
+    <script>
+        // ポモドーロタイマー機能
+        let timeLeft = 25 * 60;
+        let timerInterval = null;
+        let isRunning = false;
+        let totalStudyTime = 0;
+        let pomodoroCount = 0;
+
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.textContent = '一時停止';
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    totalStudyTime++;
+                    updateTimerDisplay();
+                    updateStudyTime();
+                    
+                    if (timeLeft === 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        pomodoroCount++;
+                        
+                        // ポモドーロ完了の処理
+                        if (pomodoroCount % 4 === 0) {
+                            // 長い休憩（15分）
+                            timeLeft = 15 * 60;
+                            alert('お疲れ様！15分の休憩を取りましょう 🎉');
+                        } else {
+                            // 短い休憩（5分）
+                            timeLeft = 5 * 60;
+                            alert('ポモドーロ完了！5分休憩しましょう ☕');
+                        }
+                        
+                        startBtn.textContent = '休憩開始';
+                        updatePoints(25);
+                        checkAchievements();
+                    }
+                }, 1000);
+            } else {
+                clearInterval(timerInterval);
+                isRunning = false;
+                startBtn.textContent = 'スタート';
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timeLeft = 25 * 60;
+            startBtn.textContent = 'スタート';
+            updateTimerDisplay();
+        }
+
+        startBtn.addEventListener('click', startTimer);
+        resetBtn.addEventListener('click', resetTimer);
+
+        // 学習時間の更新
+        function updateStudyTime() {
+            const hours = Math.floor(totalStudyTime / 3600);
+            const minutes = Math.floor((totalStudyTime % 3600) / 60);
+            document.getElementById('todayTime').textContent = `${hours}h ${minutes}m`;
+        }
+
+        // ポイントの更新
+        let totalPoints = 0;
+        function updatePoints(points) {
+            totalPoints += points;
+            document.getElementById('totalPoints').textContent = totalPoints;
+        }
+
+        // 実績チェック
+        function checkAchievements() {
+            if (pomodoroCount === 1) {
+                showAchievement();
+            }
+        }
+
+        function showAchievement() {
+            const popup = document.getElementById('achievementPopup');
+            popup.classList.add('show');
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+
+        // 仮想ユーザーの追加（デモ用）
+        const demoUsers = [
+            { name: '田中さん', avatar: '👩‍🎓', status: '数学勉強中' },
+            { name: '佐藤さん', avatar: '👨‍💻', status: 'プログラミング' },
+            { name: '山田さん', avatar: '📚', status: '英語学習中' },
+            { name: '鈴木さん', avatar: '✏️', status: '休憩中' },
+            { name: '高橋さん', avatar: '🎯', status: '集中モード' }
+        ];
+
+        function addDemoUsers() {
+            const container = document.getElementById('userAvatars');
+            demoUsers.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                userCard.innerHTML = `
+                    <div class="user-avatar">${user.avatar}</div>
+                    <div class="user-name">${user.name}</div>
+                    <div class="user-status">${user.status}</div>
+                `;
+                container.appendChild(userCard);
+            });
+        }
+
+        // AIアシスタントのクリックイベント
+        document.getElementById('aiAssistant').addEventListener('click', () => {
+            alert('AI学習アシスタント機能は有料版で利用可能です！\n質問に即座に回答し、学習をサポートします。');
+        });
+
+        // 初期化
+        addDemoUsers();
+        updateTimerDisplay();
+
+        // リアルタイム感を出すための演出
+        setInterval(() => {
+            const count = 10 + Math.floor(Math.random() * 8);
+            document.getElementById('activeCount').textContent = `${count}人がオンライン`;
+        }, 30000);
+    </script>
+</body>
+</html>
