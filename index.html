@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StudySpace - みんなで頑張るバーチャル勉強部屋</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -11,11 +12,39 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: white;
+            --text-color: #333;
+            --sidebar-bg: white;
+            --input-bg: #f5f7fa;
+            --border-color: #e0e0e0;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --timer-bg: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .dark-mode {
+            --primary-gradient: linear-gradient(135deg, #7c93e0 0%, #8a5dbf 100%);
+            --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            --card-bg: #1e2a3a;
+            --text-color: #e0e0e0;
+            --sidebar-bg: #1a2432;
+            --input-bg: #2a3442;
+            --border-color: #344356;
+            --header-bg: rgba(30, 42, 58, 0.95);
+            --shadow: 0 10px 30px rgba(0,0,0,0.3);
+            --timer-bg: linear-gradient(135deg, #9c27b0 0%, #f44336 100%);
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
             min-height: 100vh;
-            color: #333;
+            color: var(--text-color);
+            transition: all 0.3s ease;
         }
 
         .container {
@@ -24,23 +53,188 @@
             padding: 20px;
         }
 
+        /* ログインモーダル */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .auth-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .auth-tab.active {
+            border-bottom: 2px solid #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .auth-form button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .auth-form button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ヘッダー */
         header {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--header-bg);
             border-radius: 20px;
             padding: 20px 30px;
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
 
         .logo {
             font-size: 28px;
             font-weight: bold;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle {
+            width: 50px;
+            height: 26px;
+            background: var(--border-color);
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0 3px;
+            justify-content: space-between;
+        }
+
+        .theme-toggle i {
+            font-size: 14px;
+            color: #666;
+            z-index: 1;
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            left: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle.dark::before {
+            left: calc(100% - 23px);
+            background: #333;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .user-menu {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 200px;
+            z-index: 100;
+            overflow: hidden;
+            display: none;
+        }
+
+        .user-menu.active {
+            display: block;
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .menu-item:hover {
+            background: var(--input-bg);
         }
 
         .user-stats {
@@ -64,17 +258,45 @@
             color: #666;
         }
 
+        /* メインコンテンツ */
         .main-content {
             display: grid;
             grid-template-columns: 1fr 300px;
             gap: 20px;
         }
 
+        .room-selection {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .room-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            color: var(--text-color);
+        }
+
+        .room-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: #667eea;
+        }
+
         .study-room {
-            background: white;
+            background: var(--card-bg);
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
 
         .room-header {
@@ -112,16 +334,20 @@
             transition: transform 0.3s ease;
         }
 
+        .dark-mode .user-card {
+            background: linear-gradient(135deg, #2a3442 0%, #3a4658 100%);
+        }
+
         .user-card:hover {
             transform: translateY(-5px);
         }
 
         .user-card.me {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
         }
 
-        .user-avatar {
+        .user-avatar-img {
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -144,7 +370,7 @@
         }
 
         .timer-section {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: var(--timer-bg);
             border-radius: 15px;
             padding: 30px;
             text-align: center;
@@ -190,6 +416,52 @@
             color: white;
         }
 
+        .timer-settings {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .timer-setting-btn {
+            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .timer-setting-btn.active {
+            background: white;
+            color: #f5576c;
+        }
+
+        .study-input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .study-input {
+            background: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            font-size: 16px;
+            color: var(--text-color);
+        }
+
+        .study-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* サイドバー */
         .sidebar {
             display: flex;
             flex-direction: column;
@@ -197,10 +469,10 @@
         }
 
         .sidebar-widget {
-            background: white;
+            background: var(--sidebar-bg);
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
 
         .widget-title {
@@ -215,7 +487,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .leaderboard-item:last-child {
@@ -237,13 +509,103 @@
             color: #764ba2;
         }
 
+        /* 音楽プレイヤー */
+        .music-player {
+            margin-top: 20px;
+        }
+
+        .music-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .music-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .music-title {
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: auto;
+        }
+
+        /* フレンド機能 */
+        .friends-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .friend-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .friend-item:last-child {
+            border-bottom: none;
+        }
+
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .friend-info {
+            flex: 1;
+        }
+
+        .friend-name {
+            font-weight: 600;
+        }
+
+        .friend-status {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .friend-action {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* AIアシスタント */
         .ai-assistant {
             position: fixed;
             bottom: 30px;
             right: 30px;
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -251,24 +613,120 @@
             color: white;
             font-size: 28px;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow);
             transition: transform 0.3s ease;
+            z-index: 100;
         }
 
         .ai-assistant:hover {
             transform: scale(1.1);
         }
 
+        .ai-chat-modal {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            height: 450px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            z-index: 99;
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .ai-chat-modal.active {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .chat-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            font-size: 14px;
+        }
+
+        .message.ai {
+            background: var(--input-bg);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            outline: none;
+            background: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .chat-input button {
+            margin-left: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* 実績ポップアップ */
         .achievement-popup {
             position: fixed;
             top: 30px;
             right: 30px;
-            background: white;
+            background: var(--card-bg);
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow);
             display: none;
             animation: slideIn 0.5s ease;
+            z-index: 100;
         }
 
         @keyframes slideIn {
@@ -286,56 +744,240 @@
             display: block;
         }
 
-        .study-input {
-            background: #f5f7fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
-            width: 100%;
-            margin-bottom: 15px;
-            font-size: 16px;
+        /* 学習分析 */
+        .analytics-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .study-input:focus {
-            outline: none;
-            border-color: #667eea;
+        .analytics-tab {
+            padding: 8px 15px;
+            background: var(--input-bg);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .analytics-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .chart-container {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--primary-gradient);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            min-height: 5px;
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-color);
+        }
+
+        /* 履歴モーダル */
+        .history-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .history-modal.active {
+            display: flex;
+        }
+
+        .history-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        /* レスポンシブデザイン */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .user-stats {
+                width: 100%;
+                justify-content: space-around;
             }
             
             .timer-display {
                 font-size: 48px;
             }
+            
+            .study-input-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .ai-chat-modal {
+                width: 90%;
+                right: 5%;
+                bottom: 80px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .room-selection {
+                gap: 8px;
+            }
+            
+            .room-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .user-card {
+                min-width: 120px;
+                padding: 10px;
+            }
+            
+            .timer-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- 認証モーダル -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-content">
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="loginTab">ログイン</div>
+                <div class="auth-tab" id="registerTab">新規登録</div>
+            </div>
+            <div class="auth-form" id="loginForm">
+                <input type="email" placeholder="メールアドレス" id="loginEmail">
+                <input type="password" placeholder="パスワード" id="loginPassword">
+                <button id="loginBtn">ログイン</button>
+            </div>
+            <div class="auth-form" id="registerForm" style="display: none;">
+                <input type="text" placeholder="ユーザー名" id="registerName">
+                <input type="email" placeholder="メールアドレス" id="registerEmail">
+                <input type="password" placeholder="パスワード" id="registerPassword">
+                <button id="registerBtn">アカウント作成</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer" style="display: none;">
         <header>
-            <div class="logo">📚 StudySpace</div>
-            <div class="user-stats">
-                <div class="stat-item">
-                    <div class="stat-value" id="todayTime">0h 0m</div>
-                    <div class="stat-label">今日の学習</div>
+            <div class="logo">
+                <i class="fas fa-book"></i> StudySpace
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="streak">0</div>
-                    <div class="stat-label">連続日数</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="totalPoints">0</div>
-                    <div class="stat-label">ポイント</div>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">T</div>
+                    <div class="user-menu" id="userMenu">
+                        <div class="menu-item" id="profileBtn">
+                            <i class="fas fa-user"></i> プロフィール
+                        </div>
+                        <div class="menu-item" id="historyBtn">
+                            <i class="fas fa-history"></i> 学習履歴
+                        </div>
+                        <div class="menu-item" id="settingsBtn">
+                            <i class="fas fa-cog"></i> 設定
+                        </div>
+                        <div class="menu-item" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i> ログアウト
+                        </div>
+                    </div>
+                    <div class="user-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="todayTime">0h 0m</div>
+                            <div class="stat-label">今日の学習</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="streak">0</div>
+                            <div class="stat-label">連続日数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalPoints">0</div>
+                            <div class="stat-label">ポイント</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
 
         <div class="main-content">
             <div class="study-room">
+                <div class="room-selection">
+                    <button class="room-btn active" data-room="room1">📖 集中ルーム #1</button>
+                    <button class="room-btn" data-room="room2">📚 英語学習ルーム</button>
+                    <button class="room-btn" data-room="room3">🧮 数学ルーム</button>
+                    <button class="room-btn" data-room="room4">💻 プログラミングルーム</button>
+                    <button class="room-btn" data-room="room5">🌙 深夜集中ルーム</button>
+                </div>
+
                 <div class="room-header">
-                    <h2 class="room-title">📖 集中ルーム #1</h2>
+                    <h2 class="room-title" id="currentRoomTitle">📖 集中ルーム #1</h2>
                     <div class="active-users">
                         <span>👥</span>
                         <span id="activeCount">12人がオンライン</span>
@@ -344,8 +986,8 @@
 
                 <div class="user-avatars" id="userAvatars">
                     <div class="user-card me">
-                        <div class="user-avatar">👨‍🎓</div>
-                        <div class="user-name">あなた</div>
+                        <div class="user-avatar-img">👨‍🎓</div>
+                        <div class="user-name" id="currentUserName">あなた</div>
                         <div class="user-status">集中モード</div>
                     </div>
                 </div>
@@ -357,9 +999,16 @@
                         <button class="btn btn-primary" id="startBtn">スタート</button>
                         <button class="btn btn-secondary" id="resetBtn">リセット</button>
                     </div>
+                    <div class="timer-settings">
+                        <button class="timer-setting-btn active" data-time="25">25分</button>
+                        <button class="timer-setting-btn" data-time="45">45分</button>
+                        <button class="timer-setting-btn" data-time="90">90分</button>
+                        <button class="timer-setting-btn" data-time="5">5分休憩</button>
+                        <button class="timer-setting-btn" data-time="15">15分休憩</button>
+                    </div>
                 </div>
 
-                <div>
+                <div class="study-input-section">
                     <input type="text" class="study-input" placeholder="今日の目標を入力..." id="goalInput">
                     <select class="study-input" id="subjectSelect">
                         <option>科目を選択</option>
@@ -369,6 +1018,30 @@
                         <option>プログラミング</option>
                         <option>その他</option>
                     </select>
+                </div>
+
+                <div class="music-player">
+                    <h3 class="widget-title">🎵 集中用BGM</h3>
+                    <div class="music-controls">
+                        <button class="music-btn" id="prevMusic"><i class="fas fa-backward"></i></button>
+                        <button class="music-btn" id="playMusic"><i class="fas fa-play"></i></button>
+                        <button class="music-btn" id="nextMusic"><i class="fas fa-forward"></i></button>
+                        <span class="music-title" id="musicTitle">自然の音 - 森林</span>
+                        <div class="volume-control">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" min="0" max="100" value="50" id="volumeControl">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-tabs">
+                    <div class="analytics-tab active" data-tab="daily">日別</div>
+                    <div class="analytics-tab" data-tab="weekly">週別</div>
+                    <div class="analytics-tab" data-tab="monthly">月別</div>
+                    <div class="analytics-tab" data-tab="subject">科目別</div>
+                </div>
+                <div class="chart-container" id="studyChart">
+                    <!-- チャートはJavaScriptで生成 -->
                 </div>
             </div>
 
@@ -396,21 +1069,51 @@
 
                 <div class="sidebar-widget">
                     <h3 class="widget-title">🎯 今週の目標</h3>
-                    <div style="background: #f0f0f0; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
-                        <div style="font-weight: 600;">合計: 15時間 / 30時間</div>
+                    <div style="background: var(--input-bg); border-radius: 10px; padding: 10px; margin-bottom: 10px;">
+                        <div style="font-weight: 600;">合計: <span id="weeklyProgress">15</span>時間 / 30時間</div>
                         <div style="background: white; border-radius: 5px; height: 10px; margin-top: 5px;">
-                            <div style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: 50%; border-radius: 5px;"></div>
+                            <div id="progressBar" style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: 50%; border-radius: 5px;"></div>
                         </div>
                     </div>
                     <div style="font-size: 14px; color: #666;">
-                        あと15時間で目標達成！<br>
+                        あと<span id="remainingHours">15</span>時間で目標達成！<br>
                         1日あたり3時間のペース
                     </div>
                 </div>
 
                 <div class="sidebar-widget">
+                    <h3 class="widget-title">👥 フレンド</h3>
+                    <div class="friends-list" id="friendsList">
+                        <div class="friend-item">
+                            <div class="friend-avatar">T</div>
+                            <div class="friend-info">
+                                <div class="friend-name">田中さん</div>
+                                <div class="friend-status">数学を勉強中</div>
+                            </div>
+                            <button class="friend-action" data-action="message">メッセージ</button>
+                        </div>
+                        <div class="friend-item">
+                            <div class="friend-avatar">S</div>
+                            <div class="friend-info">
+                                <div class="friend-name">佐藤さん</div>
+                                <div class="friend-status">オンライン</div>
+                            </div>
+                            <button class="friend-action" data-action="message">メッセージ</button>
+                        </div>
+                        <div class="friend-item">
+                            <div class="friend-avatar">Y</div>
+                            <div class="friend-info">
+                                <div class="friend-name">山田さん</div>
+                                <div class="friend-status">オフライン</div>
+                            </div>
+                            <button class="friend-action" data-action="message">メッセージ</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-widget">
                     <h3 class="widget-title">🔥 獲得バッジ</h3>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;" id="badgesContainer">
                         <span style="font-size: 32px;" title="初心者">🌱</span>
                         <span style="font-size: 32px;" title="3日連続">🔥</span>
                         <span style="font-size: 32px;" title="早起き">🌅</span>
@@ -423,16 +1126,213 @@
     </div>
 
     <div class="ai-assistant" id="aiAssistant" title="AI学習アシスタント">
-        🤖
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="ai-chat-modal" id="aiChatModal">
+        <div class="chat-header">
+            <div>AI学習アシスタント</div>
+            <div id="closeChat"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai">こんにちは！学習に関するお手伝いをします。何について質問がありますか？</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" placeholder="メッセージを入力..." id="chatInput">
+            <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+        </div>
     </div>
 
     <div class="achievement-popup" id="achievementPopup">
         <div style="font-size: 48px; text-align: center; margin-bottom: 10px;">🎉</div>
         <div style="font-weight: bold; text-align: center;">新しいバッジを獲得！</div>
-        <div style="text-align: center; color: #666; margin-top: 5px;">「集中マスター」</div>
+        <div style="text-align: center; color: #666; margin-top: 5px;" id="achievementName">「集中マスター」</div>
+    </div>
+
+    <div class="history-modal" id="historyModal">
+        <div class="history-content">
+            <div class="history-header">
+                <h2>学習履歴</h2>
+                <div id="closeHistory"><i class="fas fa-times"></i></div>
+            </div>
+            <div id="historyList">
+                <!-- 履歴はJavaScriptで生成 -->
+            </div>
+        </div>
     </div>
 
     <script>
+        // ユーザー認証機能
+        const authModal = document.getElementById('authModal');
+        const mainContainer = document.getElementById('mainContainer');
+        const loginTab = document.getElementById('loginTab');
+        const registerTab = document.getElementById('registerTab');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const currentUserName = document.getElementById('currentUserName');
+        const userAvatar = document.getElementById('userAvatar');
+        const userMenu = document.getElementById('userMenu');
+        const historyModal = document.getElementById('historyModal');
+        const historyBtn = document.getElementById('historyBtn');
+        const closeHistory = document.getElementById('closeHistory');
+        const historyList = document.getElementById('historyList');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // ダークモードの状態を確認
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            themeToggle.classList.add('dark');
+        }
+
+        // ダークモード切り替え
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            themeToggle.classList.toggle('dark');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+
+        // ユーザーメニューの表示
+        userAvatar.addEventListener('click', () => {
+            userMenu.classList.toggle('active');
+        });
+
+        // 画面の他の部分をクリックしたらメニューを閉じる
+        document.addEventListener('click', (e) => {
+            if (!userAvatar.contains(e.target) && !userMenu.contains(e.target)) {
+                userMenu.classList.remove('active');
+            }
+        });
+
+        // 学習履歴の表示
+        historyBtn.addEventListener('click', () => {
+            historyModal.classList.add('active');
+            generateHistory();
+        });
+
+        closeHistory.addEventListener('click', () => {
+            historyModal.classList.remove('active');
+        });
+
+        // ログアウト機能
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        });
+
+        // 学習履歴の生成
+        function generateHistory() {
+            historyList.innerHTML = '';
+            
+            const historyData = [
+                { date: '2023-10-15', subject: '数学', time: '2時間30分', goal: '微積分の復習' },
+                { date: '2023-10-14', subject: '英語', time: '1時間45分', goal: 'TOEIC対策' },
+                { date: '2023-10-13', subject: 'プログラミング', time: '3時間15分', goal: 'React学習' },
+                { date: '2023-10-12', subject: '物理', time: '2時間', goal: '力学の問題集' },
+                { date: '2023-10-11', subject: '数学', time: '2時間45分', goal: '確率の練習' }
+            ];
+            
+            historyData.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div>
+                        <div style="font-weight: 600;">${item.date} - ${item.subject}</div>
+                        <div style="font-size: 14px; color: #666;">${item.goal}</div>
+                    </div>
+                    <div style="font-weight: 600; color: #667eea;">${item.time}</div>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // デモ用のユーザーデータ
+        let currentUser = null;
+
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        });
+
+        registerTab.addEventListener('click', () => {
+            registerTab.classList.add('active');
+            loginTab.classList.remove('active');
+            registerForm.style.display = 'block';
+            loginForm.style.display = 'none';
+        });
+
+        loginBtn.addEventListener('click', () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (email && password) {
+                // デモ用のログイン処理
+                currentUser = {
+                    name: email.split('@')[0],
+                    email: email,
+                    avatar: email.charAt(0).toUpperCase()
+                };
+                
+                currentUserName.textContent = currentUser.name;
+                userAvatar.textContent = currentUser.avatar;
+                
+                authModal.style.display = 'none';
+                mainContainer.style.display = 'block';
+                
+                // ローカルストレージにユーザー情報を保存
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            } else {
+                alert('メールアドレスとパスワードを入力してください');
+            }
+        });
+
+        registerBtn.addEventListener('click', () => {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (name && email && password) {
+                // デモ用の登録処理
+                currentUser = {
+                    name: name,
+                    email: email,
+                    avatar: name.charAt(0).toUpperCase()
+                };
+                
+                currentUserName.textContent = currentUser.name;
+                userAvatar.textContent = currentUser.avatar;
+                
+                authModal.style.display = 'none';
+                mainContainer.style.display = 'block';
+                
+                // ローカルストレージにユーザー情報を保存
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            } else {
+                alert('すべてのフィールドを入力してください');
+            }
+        });
+
+        // ページ読み込み時にユーザー情報をチェック
+        window.addEventListener('load', () => {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                currentUserName.textContent = currentUser.name;
+                userAvatar.textContent = currentUser.avatar;
+                authModal.style.display = 'none';
+                mainContainer.style.display = 'block';
+            }
+        });
+
         // ポモドーロタイマー機能
         let timeLeft = 25 * 60;
         let timerInterval = null;
@@ -443,6 +1343,7 @@
         const timerDisplay = document.getElementById('timer');
         const startBtn = document.getElementById('startBtn');
         const resetBtn = document.getElementById('resetBtn');
+        const timerSettings = document.querySelectorAll('.timer-setting-btn');
 
         function updateTimerDisplay() {
             const minutes = Math.floor(timeLeft / 60);
@@ -496,6 +1397,18 @@
             updateTimerDisplay();
         }
 
+        // タイマー設定の変更
+        timerSettings.forEach(setting => {
+            setting.addEventListener('click', () => {
+                timerSettings.forEach(s => s.classList.remove('active'));
+                setting.classList.add('active');
+                
+                const time = parseInt(setting.dataset.time);
+                timeLeft = time * 60;
+                updateTimerDisplay();
+            });
+        });
+
         startBtn.addEventListener('click', startTimer);
         resetBtn.addEventListener('click', resetTimer);
 
@@ -504,6 +1417,20 @@
             const hours = Math.floor(totalStudyTime / 3600);
             const minutes = Math.floor((totalStudyTime % 3600) / 60);
             document.getElementById('todayTime').textContent = `${hours}h ${minutes}m`;
+            
+            // 週間目標の更新
+            const weeklyProgress = document.getElementById('weeklyProgress');
+            const progressBar = document.getElementById('progressBar');
+            const remainingHours = document.getElementById('remainingHours');
+            
+            const currentHours = 15 + hours;
+            weeklyProgress.textContent = currentHours;
+            
+            const progressPercent = (currentHours / 30) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            
+            const remaining = 30 - currentHours;
+            remainingHours.textContent = remaining;
         }
 
         // ポイントの更新
@@ -511,21 +1438,54 @@
         function updatePoints(points) {
             totalPoints += points;
             document.getElementById('totalPoints').textContent = totalPoints;
+            
+            // ポイントに応じて連続日数を更新（デモ用）
+            if (totalPoints >= 100) {
+                document.getElementById('streak').textContent = Math.floor(totalPoints / 100);
+            }
         }
 
         // 実績チェック
         function checkAchievements() {
             if (pomodoroCount === 1) {
-                showAchievement();
+                showAchievement('集中マスター');
+            } else if (pomodoroCount === 5) {
+                showAchievement('学習の習慣化');
+            } else if (pomodoroCount === 10) {
+                showAchievement('ポモドーロエキスパート');
             }
         }
 
-        function showAchievement() {
+        function showAchievement(name) {
             const popup = document.getElementById('achievementPopup');
+            const achievementName = document.getElementById('achievementName');
+            
+            achievementName.textContent = `「${name}」`;
             popup.classList.add('show');
+            
             setTimeout(() => {
                 popup.classList.remove('show');
             }, 3000);
+            
+            // バッジを追加
+            const badgesContainer = document.getElementById('badgesContainer');
+            const newBadge = document.createElement('span');
+            newBadge.style.fontSize = '32px';
+            newBadge.title = name;
+            
+            switch(name) {
+                case '集中マスター':
+                    newBadge.textContent = '🎯';
+                    break;
+                case '学習の習慣化':
+                    newBadge.textContent = '📅';
+                    break;
+                case 'ポモドーロエキスパート':
+                    newBadge.textContent = '🍅';
+                    break;
+            }
+            
+            badgesContainer.appendChild(newBadge);
         }
 
         // 仮想ユーザーの追加（デモ用）
@@ -543,7 +1503,7 @@
                 const userCard = document.createElement('div');
                 userCard.className = 'user-card';
                 userCard.innerHTML = `
-                    <div class="user-avatar">${user.avatar}</div>
+                    <div class="user-avatar-img">${user.avatar}</div>
                     <div class="user-name">${user.name}</div>
                     <div class="user-status">${user.status}</div>
                 `;
@@ -551,19 +1511,185 @@
             });
         }
 
-        // AIアシスタントのクリックイベント
-        document.getElementById('aiAssistant').addEventListener('click', () => {
-            alert('AI学習アシスタント機能は有料版で利用可能です！\n質問に即座に回答し、学習をサポートします。');
+        // AIアシスタントのチャット機能
+        const aiAssistant = document.getElementById('aiAssistant');
+        const aiChatModal = document.getElementById('aiChatModal');
+        const closeChat = document.getElementById('closeChat');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendMessage = document.getElementById('sendMessage');
+
+        aiAssistant.addEventListener('click', () => {
+            aiChatModal.classList.toggle('active');
+        });
+
+        closeChat.addEventListener('click', () => {
+            aiChatModal.classList.remove('active');
+        });
+
+        function addMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        sendMessage.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                addMessage(message, true);
+                chatInput.value = '';
+                
+                // 擬似的なAIの返答
+                setTimeout(() => {
+                    let response = '';
+                    
+                    if (message.includes('数学') || message.includes('算数')) {
+                        response = '数学の学習には、基礎的な公式の理解と問題演習が効果的です。どの単元でお困りですか？';
+                    } else if (message.includes('英語') || message.includes('英会話')) {
+                        response = '英語学習には毎日少しずつ触れることが大切です。単語暗記と音読を組み合わせると効果的ですよ。';
+                    } else if (message.includes('集中') || message.includes('やる気')) {
+                        response = '集中力を高めるには、25分集中して5分休憩するポモドーロテクニックがおすすめです。今実践中ですね！';
+                    } else {
+                        response = '学習に関するご質問ですね。より効果的なアドバイスをするためにもう少し具体的に教えてもらえますか？';
+                    }
+                    
+                    addMessage(response);
+                }, 1000);
+            }
+        });
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage.click();
+            }
+        });
+
+        // ルーム選択機能
+        const roomButtons = document.querySelectorAll('.room-btn');
+        const currentRoomTitle = document.getElementById('currentRoomTitle');
+
+        roomButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                roomButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentRoomTitle.textContent = button.textContent;
+                
+                // ルーム変更時にオンラインユーザー数を更新
+                const randomCount = 5 + Math.floor(Math.random() * 15);
+                document.getElementById('activeCount').textContent = `${randomCount}人がオンライン`;
+            });
+        });
+
+        // 学習分析チャートの生成
+        function generateStudyChart() {
+            const chartContainer = document.getElementById('studyChart');
+            chartContainer.innerHTML = '';
+            
+            const days = ['月', '火', '水', '木', '金', '土', '日'];
+            const hours = [2, 3, 1, 4, 2, 5, 3]; // デモデータ
+            
+            days.forEach((day, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = `${hours[index] * 30}px`;
+                
+                const label = document.createElement('div');
+                label.className = 'chart-label';
+                label.textContent = day;
+                
+                bar.appendChild(label);
+                chartContainer.appendChild(bar);
+            });
+        }
+
+        // タブ切り替え機能
+        const analyticsTabs = document.querySelectorAll('.analytics-tab');
+        
+        analyticsTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                analyticsTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // ここで異なる期間のデータを表示する処理を追加可能
+                generateStudyChart();
+            });
+        });
+
+        // BGMプレイヤー機能
+        const playMusicBtn = document.getElementById('playMusic');
+        const prevMusicBtn = document.getElementById('prevMusic');
+        const nextMusicBtn = document.getElementById('nextMusic');
+        const volumeControl = document.getElementById('volumeControl');
+        const musicTitle = document.getElementById('musicTitle');
+        
+        let isPlaying = false;
+        const musicList = [
+            '自然の音 - 森林',
+            'クラシック - モーツァルト',
+            '集中作業用BGM',
+            'ホワイトノイズ',
+            'ピアノ曲 - リラックス'
+        ];
+        let currentMusicIndex = 0;
+        
+        playMusicBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playMusicBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+            musicTitle.textContent = isPlaying ? musicList[currentMusicIndex] : '停止中';
+        });
+        
+        prevMusicBtn.addEventListener('click', () => {
+            currentMusicIndex = (currentMusicIndex - 1 + musicList.length) % musicList.length;
+            musicTitle.textContent = musicList[currentMusicIndex];
+            if (isPlaying) {
+                // ここで実際には音楽を変更する処理を追加
+            }
+        });
+        
+        nextMusicBtn.addEventListener('click', () => {
+            currentMusicIndex = (currentMusicIndex + 1) % musicList.length;
+            musicTitle.textContent = musicList[currentMusicIndex];
+            if (isPlaying) {
+                // ここで実際には音楽を変更する処理を追加
+            }
+        });
+        
+        volumeControl.addEventListener('input', () => {
+            // 音量調整の処理
+        });
+
+        // フレンド機能
+        const friendsList = document.getElementById('friendsList');
+        const friendActions = document.querySelectorAll('.friend-action');
+        
+        friendActions.forEach(button => {
+            button.addEventListener('click', () => {
+                const action = button.dataset.action;
+                const friendName = button.parentElement.querySelector('.friend-name').textContent;
+                
+                if (action === 'message') {
+                    alert(`${friendName}にメッセージを送信する機能は準備中です`);
+                }
+            });
         });
 
         // 初期化
         addDemoUsers();
         updateTimerDisplay();
+        generateStudyChart();
 
         // リアルタイム感を出すための演出
         setInterval(() => {
             const count = 10 + Math.floor(Math.random() * 8);
             document.getElementById('activeCount').textContent = `${count}人がオンライン`;
+            
+            // フレンドのステータスをランダムに更新
+            const statuses = ['オンライン', '勉強中', '休憩中', 'オフライン'];
+            document.querySelectorAll('.friend-status').forEach(status => {
+                status.textContent = statuses[Math.floor(Math.random() * statuses.length)];
+            });
         }, 30000);
     </script>
 </body>
